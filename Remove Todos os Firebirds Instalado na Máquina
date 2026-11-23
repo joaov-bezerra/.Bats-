@@ -1,0 +1,61 @@
+@echo off
+title Remoção completa do Firebird
+echo ======================================================
+echo      REMOÇÃO COMPLETA DO FIREBIRD - TODAS AS VERSÕES
+echo ======================================================
+echo.
+
+:: 1. Finaliza serviços e processos
+echo [1/6] Parando serviços do Firebird...
+net stop FirebirdServerDefaultInstance /y >nul 2>&1
+net stop FirebirdGuardianDefaultInstance /y >nul 2>&1
+net stop FirebirdServerDefaultInstance2 /y >nul 2>&1
+net stop FirebirdServerDefaultInstance3 /y >nul 2>&1
+net stop FirebirdServer /y >nul 2>&1
+net stop FirebirdGuardian /y >nul 2>&1
+
+echo [2/6] Matando processos fbserver e fbguard...
+taskkill /F /IM fbserver.exe >nul 2>&1
+taskkill /F /IM fbguard.exe >nul 2>&1
+taskkill /F /IM isql.exe >nul 2>&1
+taskkill /F /IM gbak.exe >nul 2>&1
+taskkill /F /IM gfix.exe >nul 2>&1
+
+:: 2. Remove serviços registrados
+echo [3/6] Removendo serviços registrados do Firebird...
+sc delete FirebirdServerDefaultInstance >nul 2>&1
+sc delete FirebirdGuardianDefaultInstance >nul 2>&1
+sc delete FirebirdServer >nul 2>&1
+sc delete FirebirdGuardian >nul 2>&1
+
+:: 3. Remove pastas padrão
+echo [4/6] Excluindo pastas padrão do Firebird...
+rmdir /S /Q "C:\Program Files\Firebird" >nul 2>&1
+rmdir /S /Q "C:\Program Files (x86)\Firebird" >nul 2>&1
+rmdir /S /Q "C:\Firebird" >nul 2>&1
+rmdir /S /Q "C:\ProgramData\Firebird" >nul 2>&1
+
+:: 4. Remove DLLs e arquivos comuns no Windows\System32 e SysWOW64
+echo [5/6] Removendo DLLs do sistema...
+del /F /Q "%SystemRoot%\System32\fbclient.dll" >nul 2>&1
+del /F /Q "%SystemRoot%\SysWOW64\fbclient.dll" >nul 2>&1
+del /F /Q "%SystemRoot%\System32\gds32.dll" >nul 2>&1
+del /F /Q "%SystemRoot%\SysWOW64\gds32.dll" >nul 2>&1
+del /F /Q "%SystemRoot%\System32\fbembed.dll" >nul 2>&1
+del /F /Q "%SystemRoot%\SysWOW64\fbembed.dll" >nul 2>&1
+
+:: 5. Remove chaves de registro
+echo [6/6] Limpando registro do Windows...
+reg delete "HKLM\SOFTWARE\Firebird Project" /f >nul 2>&1
+reg delete "HKLM\SOFTWARE\WOW6432Node\Firebird Project" /f >nul 2>&1
+reg delete "HKLM\SYSTEM\CurrentControlSet\Services\FirebirdServerDefaultInstance" /f >nul 2>&1
+reg delete "HKLM\SYSTEM\CurrentControlSet\Services\FirebirdGuardianDefaultInstance" /f >nul 2>&1
+reg delete "HKCU\Software\Firebird Project" /f >nul 2>&1
+
+echo.
+echo ======================================================
+echo    FIREBIRD REMOVIDO COMPLETAMENTE DO SISTEMA
+echo ======================================================
+echo.
+pause
+exit
